@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+set -eu
+
+export DIRENV_LOG_FORMAT=
+
+for cluster in $(curl -s -u "${RANCHER_BEARER_TOKEN}" "${RANCHER_ENDPOINT}/clusters"  | jq -r '.data[] | .name' | egrep -v local); do
+  [[ -d "${cluster}" ]] && continue
+  mkdir -p "${cluster}"
+  ln -s ../scripts/cluster-envrc "${cluster}/.envrc"
+  pushd "${cluster}"
+  direnv allow 2>&1 >/dev/null
+  popd
+  echo "cluster directory created and allowed: ${cluster}"
+done
+

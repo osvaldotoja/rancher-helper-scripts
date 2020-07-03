@@ -1,0 +1,15 @@
+set -eu
+export RANCHER_CONFDIR="$HOME/.rancher"
+
+CWD=$(dirname `pwd`)
+CLUSTERNAME=$(basename ${CWD})
+
+export KUBECONFIG="${RANCHER_CONFDIR}/${CLUSTERNAME}/.kubeconfig"
+export NAMESPACE="$(basename `pwd`)" 
+
+# https://direnv.net/man/direnv-stdlib.1.html#codehas-ltcommandgtcode
+if has kubens; then
+  kubens $NAMESPACE
+else
+  kubectl config set-context --current --namespace=$NAMESPACE
+fi

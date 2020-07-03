@@ -1,0 +1,16 @@
+PATH_add ../scripts
+
+export RANCHER_CONFDIR="$HOME/.rancher"
+
+export CLUSTERNAME="$(basename `pwd`)"
+
+# first time setup
+if [ ! -d "${RANCHER_CONFDIR}/${CLUSTERNAME}" ]
+then
+  source ../.envrc
+  mkdir "${RANCHER_CONFDIR}/${CLUSTERNAME}"
+  curl -s -u "${RANCHER_BEARER_TOKEN}" "${RANCHER_ENDPOINT}/clusters?name=$CLUSTERNAME"  | jq -r '.data[].id' > "${RANCHER_CONFDIR}/${CLUSTERNAME}/cluster-id"
+  export CLUSTERID=$(cat "${RANCHER_CONFDIR}/${CLUSTERNAME}/cluster-id")
+  curl -s -u "${RANCHER_BEARER_TOKEN}" "$RANCHER_ENDPOINT/clusters/$CLUSTERID?action=generateKubeconfig" -X POST -H 'content-type: application/json' | jq -r .config > "${RANCHER_CONFDIR}/${CLUSTERNAME}/.kubeconfig"
+fi
+export KUBECONFIG="${RANCHER_CONFDIR}/${CLUSTERNAME}/.kubeconfig"

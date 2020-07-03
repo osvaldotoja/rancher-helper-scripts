@@ -1,0 +1,10 @@
+# Ignore everything:
+#*
+
+# Except for:
+# docs
+#README.md
+# rancher .envrc file
+#.envrc
+# scripts directory
+#!scripts/

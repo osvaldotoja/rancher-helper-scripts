@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+set -eu
+
+export DIRENV_LOG_FORMAT=
+
+for ns in $(kubens); do
+  [[ -d "${ns}" ]] && continue
+  mkdir -p "${ns}"
+  ln -s ../../scripts/namespace-envrc "${ns}/.envrc"
+  pushd "${ns}"
+  direnv allow 2>&1 >/dev/null
+  popd
+  echo "namespace created and allowed: ${ns}"
+done
+
